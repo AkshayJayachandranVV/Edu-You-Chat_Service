@@ -1,7 +1,9 @@
+import { AnyBulkWriteOperation } from "mongoose";
 import {ChatService} from "../../application/use-case/chat";
-// import {ITutor, registerData , tempId , LoginTutor, Email} from "../../domain/entities/";
+import {updateRead} from "../../domain/entities/IMessage";
+import {findRoom,RoomUser} from "../../domain/entities/IRoom";
 
-class ChatController {
+class ChatController { 
     private chatService: ChatService
 
     constructor() {
@@ -58,7 +60,72 @@ class ChatController {
             console.log("error in resend otp in usercontroller", error);
         }
     }
+    
 
+    async fetchLastMessage(data :any ){
+        try {
+            console.log(data, "storefile -------------");
+            const result = await this.chatService.fetchLastMessage(data)
+
+            console.log(result, "of the resendOtp")
+            return result
+        } catch (error) {
+            console.log("error in resend otp in usercontroller", error);
+        }
+    }
+
+
+    async updateReadMessage(data :any ){
+        try {
+            console.log(data, "update read -------------");
+            const result = await this.chatService.updateReadMessage(data)
+
+            console.log(result, "of the resendOtp")
+            return result
+        } catch (error) {
+            console.log("error in resend otp in usercontroller", error);
+        }
+    }
+
+
+    async updateReadStatus(data :any ){
+        try {
+            console.log(data, "storefile -------------");
+            const result = await this.chatService.updateReadStatus(data)
+
+            console.log(result, "of the resendOtp")
+            return result
+        } catch (error) {
+            console.log("error in resend otp in usercontroller", error);
+        }
+    }
+
+
+    async updateReadUsers(data :findRoom ){
+        try {
+            console.log(data, "lalalallalalalallalalal -------------");
+            const result = await this.chatService.updateReadUsers(data)
+
+            console.log(result, "of the resendOtp")
+            return result
+        } catch (error) {
+            console.log("error in resend otp in usercontroller", error);
+        }
+    }
+
+
+
+    async fetchGroupMembers(data :RoomUser ){
+        try {
+            console.log(data, "lalalallalalalallalalal -------------");
+            const result = await this.chatService.fetchGroupMembers(data)
+
+            console.log(result, "of the resendOtp")
+            return result
+        } catch (error) {
+            console.log("error in resend otp in usercontroller", error);
+        }
+    }
 
 }
 

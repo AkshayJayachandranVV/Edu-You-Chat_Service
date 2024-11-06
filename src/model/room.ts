@@ -17,7 +17,17 @@ const roomSchema = new Schema<IRoomDocument>({
   lastMessageTime: {
     type: Date,
     default: Date.now
-  }
+  },
+  view: [{
+    userId: {
+      type: String,
+      required: true
+    },
+    isRead: {
+      type: Boolean,
+      default: false
+    }
+  }],
 }, { timestamps: true });
 
 export const Room = mongoose.model<IRoomDocument>('Room', roomSchema);

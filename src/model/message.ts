@@ -23,6 +23,20 @@ const messageSchema = new Schema<IMessageDocument>({
     type: String,
     required: false
   },
+  isRead: {
+    type: String,
+    required: false
+  },
+  view: [{
+    userId: {
+      type: String,
+      required: true
+    },
+    isRead: {
+      type: Boolean,
+      default: false
+    }
+  }],
   createdAt: {
     type: Date,
     default: Date.now
