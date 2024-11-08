@@ -17,6 +17,11 @@ export default class MessageHandlers {
                 response = await chatController.saveMessage(data)
                 console.log("data reached inside message handler.ts",response);
                 break;
+            case 'save-media' :
+                console.log('Handling operation',operations,data);
+                response = await chatController.storeFile(data)
+                console.log("data reached inside message handler.ts",response);
+                break;
             case 'user-fetch-chat' :
                 console.log('Handling operation',operations,data);
                 response = await chatController.fetchChat(data)
