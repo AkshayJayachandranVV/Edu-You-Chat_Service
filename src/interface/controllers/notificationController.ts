@@ -1,5 +1,5 @@
 import {NotificationService} from "../../application/use-case/notification"
-import { IRoomIdsArray } from "../../domain/entities/INotification";
+import { IRoomIdsArray,IStoreNotificationData} from "../../domain/entities/INotification";
 
 class NotificationController {
     private notificationService: NotificationService
@@ -10,7 +10,7 @@ class NotificationController {
 
 
    
-    async storeNotification(data :any ){
+    async storeNotification(data :IStoreNotificationData ){
         try {
             console.log(data, "resend otp");
             const result = await this.notificationService.storeNotification(data)
@@ -26,6 +26,7 @@ class NotificationController {
     async fetchNotification(data :IRoomIdsArray  ){
         try {
             console.log(data, "fetch notify");
+            
             const result = await this.notificationService.fetchNotification(data)
 
             console.log(result, "of the resendOtp")

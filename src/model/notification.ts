@@ -8,6 +8,10 @@ const notificationSchema = new Schema<INotificationDocument>(
         type: String,
         required: true
       },
+      userId: {
+        type: String,
+        required: true
+      },
       coursename: {
         type: String,
         required: true

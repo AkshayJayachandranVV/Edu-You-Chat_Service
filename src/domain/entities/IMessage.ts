@@ -19,5 +19,31 @@ export interface updateRead {
   userId: string;
 }
 
+export interface Course {
+  _id: Types.ObjectId; 
+  courseName: string;
+  courseDescription: string;
+  thumbnail?: string; // Optional fields
+}
+
+export interface CourseWithLastMessage extends Course {
+  lastMessage: string;
+  lastMessageTime: Date | null;
+}
+
+
+export interface MessageUser { 
+  roomId: string;
+   senderId: string;
+    content: string
+  }
+
+export interface StoreFile {
+   roomId: string; 
+   senderId: string;
+    s3Key: string;
+     mediaType: string
+     }
+  
 
 export interface IMessageDocument extends IMessage, Document {}

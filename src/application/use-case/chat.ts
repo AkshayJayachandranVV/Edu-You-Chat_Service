@@ -1,6 +1,6 @@
 import { ChatRepository } from "../../domain/repositories/ChatRepository";
-import { IRoom,findRoom,RoomUser} from '../../domain/entities/IRoom';
-import {updateRead} from '../../domain/entities/IMessage';
+import { IRoom,findRoom,RoomUser,streamFetch,UserCourse,fetchChat} from '../../domain/entities/IRoom';
+import {MessageUser,Course,StoreFile,updateRead} from '../../domain/entities/IMessage';
 
 export class ChatService {
     private chatRepo: ChatRepository;
@@ -9,7 +9,7 @@ export class ChatService {
         this.chatRepo = new ChatRepository();
     }
 
-    async createRoom(data: any): Promise<IRoom | null> {  // Change return type to IChat or null
+    async createRoom(data: UserCourse): Promise<IRoom | null> {  // Change return type to IChat or null
         try {
             console.log(data, "data in createRoom");
 
@@ -27,7 +27,7 @@ export class ChatService {
     }
 
 
-    async saveMessage(data: any){  // Change return type to IChat or null
+    async saveMessage(data: MessageUser){  // Change return type to IChat or null
         try {
             console.log(data, "data in createRoom");
 
@@ -44,7 +44,7 @@ export class ChatService {
     }
 
 
-    async fetchChat(data: any){  // Change return type to IChat or null
+    async fetchChat(data: fetchChat){  // Change return type to IChat or null
         try {
             console.log(data, "data in createRoom");
 
@@ -61,7 +61,7 @@ export class ChatService {
     }
 
 
-    async storeFile(data: any){  // Change return type to IChat or null
+    async storeFile(data: StoreFile){  // Change return type to IChat or null
         try {
             console.log(data, "data in createRoom");
 
@@ -79,7 +79,7 @@ export class ChatService {
 
 
     
-    async fetchLastMessage(data: any){  // Change return type to IChat or null
+    async fetchLastMessage(data: Course[]){  // Change return type to IChat or null
         try {
             console.log(data, "data in createRoom");
 
@@ -96,7 +96,7 @@ export class ChatService {
     }
 
 
-    async updateReadMessage(data: any){  // Change return type to IChat or null
+    async updateReadMessage(data: updateRead){  // Change return type to IChat or null
         try {
             console.log(data, "data in createRoom");
 
@@ -113,21 +113,7 @@ export class ChatService {
     }
 
     
-    async updateReadStatus(data: any){  // Change return type to IChat or null
-        try {
-            console.log(data, "data in createRoom");
 
-
-            const lastMessage = await this.chatRepo.updateReadStatus(data);
-            return lastMessage;  
-
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(`Error creating room: ${error.message}`);
-            }
-            throw error;
-        }
-    }
 
 
 
@@ -165,6 +151,26 @@ export class ChatService {
         }
     }
 
+
+
+    async fetchStreamUsers(data:streamFetch){  // Change return type to IChat or null
+        try {
+            console.log(data, "lalalallalalalallalalal");
+
+           const {courseId,tutorId} =data
+            const lastMessage = await this.chatRepo.fetchStreamUsers(courseId,tutorId);
+            return lastMessage;  
+
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new Error(`Error creating room: ${error.message}`);
+            }
+            throw error;
+        }
+    }
+
+
 }
+
 
 

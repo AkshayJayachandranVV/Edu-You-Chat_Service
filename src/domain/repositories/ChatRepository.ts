@@ -1,8 +1,8 @@
 import { Room } from "../../model/room";
 import { Types } from 'mongoose';
 import { Message } from "../../model/message";
-import { IRoomDocument,IRoom } from '../entities/IRoom';
-import { IMessageDocument,updateRead } from '../entities/IMessage';
+import { IRoomDocument,IRoom,fetchChat} from '../entities/IRoom';
+import { IMessageDocument,updateRead,Course,CourseWithLastMessage,MessageUser,StoreFile} from '../entities/IMessage';
 
 export class ChatRepository {
 
@@ -98,7 +98,7 @@ export class ChatRepository {
     // }
 
 
-    async saveMessage(data: { roomId: string, senderId: string, content: string }) {
+    async saveMessage(data:MessageUser ) {
         try {
             console.log('Data in saveMessage:', data);  // Log input to check if correct data is passed
             const { roomId, senderId, content } = data;
@@ -108,6 +108,13 @@ export class ChatRepository {
             if (!room) {
                 throw new Error(`Room with ID ${roomId} not found`);
             }
+    
+            // Map participantIds to the desired format
+            const participantIdsArray = room.participantIds.map(participantId => ({
+                userId: participantId
+            }));
+            
+            console.log("Participant IDs as objects:", participantIdsArray);
     
             // Check the current view array for read status
             const readCount = room.view.filter(participant => participant.isRead).length;
@@ -133,7 +140,14 @@ export class ChatRepository {
             await room.save();
     
             console.log('Message saved successfully');
-            return { ...newMessage.toObject(), isRead };  // Return message with isRead field
+            
+            // Return message with isRead field and participantIds array in the desired structure
+            return { 
+                ...newMessage.toObject(), 
+                isRead,
+                participantIds: participantIdsArray  // Return the formatted participantIds array
+            };
+    
         } catch (error) {
             console.error('Error saving message:', error);
             throw new Error('Error saving message');
@@ -141,10 +155,11 @@ export class ChatRepository {
     }
     
     
+    
 
 
 
-    async fetchChat(data: { roomId: string; userId: string }) {
+    async fetchChat(data: fetchChat) {
         try {
             console.log('Data received to fetch chat:', data);
             const { roomId, userId } = data;
@@ -255,7 +270,7 @@ export class ChatRepository {
 
 
 
-    async storeFile(data: { roomId: string; senderId: string; s3Key: string; mediaType: string }) {
+    async storeFile(data:StoreFile) {
         try {
             console.log('Data in save message:', data);  // Log input for verification
             const { roomId, senderId, s3Key, mediaType } = data;
@@ -265,6 +280,11 @@ export class ChatRepository {
             if (!room) {
                 throw new Error(`Room with ID ${roomId} not found`);
             }
+    
+            // Map participantIds to the desired format
+            const participantIdsArray = room.participantIds.map(participantId => ({
+                userId: participantId
+            }));
     
             // Ensure room._id is an ObjectId by casting it
             const roomObjectId = room._id as Types.ObjectId;
@@ -284,7 +304,7 @@ export class ChatRepository {
                 newMessageData.content = s3Key;  // Fallback for plain text content
             }
     
-            // Save the new message document in the Message collection
+            // Save the new message document in the Message collection 
             const newMessage = await Message.create(newMessageData);
     
             // Update the lastMessage and lastMessageTime in the Room document
@@ -293,41 +313,47 @@ export class ChatRepository {
             await room.save();
     
             console.log('Message saved successfully');
-            return newMessage;  // Return the saved message document
+    
+            // Return the saved message document along with the participantIds array
+            return {
+                ...newMessage.toObject(),         // Convert to plain object if needed
+                participantIds: participantIdsArray  // Add participantIds in desired structure
+            };
         } catch (error) {
             console.error('Error saving message:', error);
             throw new Error('Error saving message');
         }
     }
+    
 
 
 
-    async fetchLastMessage(data: any) {
+    async fetchLastMessage(data: Course[]): Promise<CourseWithLastMessage[]> {
         try {
-            console.log('Data received to fetch chat:', data); 
-
-            const coursesWithLastMessages = await Promise.all(
-                data.map(async (course:any) => {
-                  const room = await Room.findOne({ roomId: course._doc._id })
-                    .sort({ lastMessageTime: -1 }) 
-                    .select('lastMessage lastMessageTime') 
-                    .lean();
-
-                  return {
-                    ...course,
-                    lastMessage: room?.lastMessage || '', // Default to empty if no last message
-                    lastMessageTime: room?.lastMessageTime || null, // Default to null if no last message time
-                  };
-                })
-              );
-            
-              return coursesWithLastMessages;
-            
+          console.log('Data received to fetch chat:', data);
+      
+          const coursesWithLastMessages = await Promise.all(
+            data.map(async (course: Course): Promise<CourseWithLastMessage> => {
+              const room = await Room.findOne({ roomId: course._id })
+                .sort({ lastMessageTime: -1 })
+                .select('lastMessage lastMessageTime')
+                .lean();
+      
+              return {
+                ...course,
+                lastMessage: room?.lastMessage || '', // Default to empty string if no last message
+                lastMessageTime: room?.lastMessageTime || null, // Default to null if no last message time
+              };
+            })
+          );
+      
+          return coursesWithLastMessages;
         } catch (error) {
-            console.error('Error fetching messages:', error); // Log the actual error
-            throw new Error('Error fetching messages');
+          console.error('Error fetching messages:', error); // Log the actual error
+          throw new Error('Error fetching messages');
         }
-    }
+      }
+      
 
 
 
@@ -360,17 +386,6 @@ export class ChatRepository {
 
 
 
-    async updateReadStatus(data:any ) {
-        try {
-            console.log('Data received to update message read status:', data);
-    
-            
-        } catch (error) {
-            console.error('Error updating message read status:', error);
-            throw new Error('Error updating message read status');
-        }
-    }
-    
 
 
     async  updateReadUsers(userId: string) {
@@ -426,6 +441,35 @@ export class ChatRepository {
             throw new Error('Error fetching group members');
         }
     }
+
+
+
+    async fetchStreamUsers(courseId: string, tutorId: string) {
+        try {
+            console.log('Fetching participants for room:', courseId, tutorId);
+    
+            // Find the room by roomId and retrieve only the participantIds field
+            const room = await Room.findOne({ roomId: courseId }, { participantIds: 1 });
+    
+            if (!room) {
+                console.error("Room not found");
+                return [];
+            }
+    
+            // Filter out the tutor's ID from the participant list
+            const participants = room.participantIds
+                .filter((participantId) => participantId !== tutorId)
+                .map((userId) => ({ userId }));
+    
+            console.log("Filtered participants:", participants);
+            return participants;
+    
+        } catch (error) {
+            console.error('Error fetching group members:', error);
+            throw new Error('Error fetching group members');
+        }
+    }
+    
 
 }
 

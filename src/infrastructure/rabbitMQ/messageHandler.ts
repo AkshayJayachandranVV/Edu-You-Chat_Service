@@ -47,11 +47,6 @@ export default class MessageHandlers {
                     response = await chatController.updateReadMessage(data)
                     console.log("data reached inside message handler.ts",response);
                     break;
-            case 'update-read-status' :
-                    console.log('Handling operation',operations,data);
-                    response = await chatController.updateReadStatus(data)
-                    console.log("data reached inside message handler.ts",response);
-                    break;
 
              case 'update-read-users' :
                     console.log('Handling operation',operations,data);
@@ -62,6 +57,12 @@ export default class MessageHandlers {
              case 'fetch-group-members' :
                         console.log('Handling operation',operations,data);
                         response = await chatController.fetchGroupMembers(data)
+                        console.log("data reached inside message handler.ts",response);
+                        break;
+
+            case 'fetch-stream-user' :
+                        console.log('Handling operation',operations,data);
+                        response = await chatController.fetchStreamUsers(data)
                         console.log("data reached inside message handler.ts",response);
                         break;
                                  

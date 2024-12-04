@@ -1,4 +1,4 @@
-import {INotification,IRoomIdsArray } from "../../domain/entities/INotification";
+import {INotification,IRoomIdsArray,IStoreNotificationData } from "../../domain/entities/INotification";
 import {NotificationRepository} from "../../domain/repositories/NotificationRepository";
 import dotenv from 'dotenv';
 
@@ -14,7 +14,7 @@ export class   NotificationService {
     }
 
    
-    async storeNotification(data: any) {  // Change return type to IChat or null
+    async storeNotification(data: IStoreNotificationData) {  // Change return type to IChat or null
         try {
             console.log(data, "data in createRoom");
 

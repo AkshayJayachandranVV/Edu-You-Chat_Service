@@ -1,7 +1,7 @@
 import { AnyBulkWriteOperation } from "mongoose";
 import {ChatService} from "../../application/use-case/chat";
-import {updateRead} from "../../domain/entities/IMessage";
-import {findRoom,RoomUser} from "../../domain/entities/IRoom";
+import {updateRead,MessageUser,StoreFile,Course} from "../../domain/entities/IMessage";
+import {findRoom,RoomUser,streamFetch,UserCourse,fetchChat} from "../../domain/entities/IRoom";
 
 class ChatController { 
     private chatService: ChatService
@@ -10,7 +10,7 @@ class ChatController {
         this.chatService = new ChatService()
     }
 
-    async createRoom(data :any ){
+    async createRoom(data :UserCourse ){
         try {
             console.log(data, "resend otp");
             const result = await this.chatService.createRoom(data)
@@ -23,7 +23,7 @@ class ChatController {
     }
 
 
-    async saveMessage(data :any ){
+    async saveMessage(data :MessageUser ){
         try {
             console.log(data, "resend otp");
             const result = await this.chatService.saveMessage(data)
@@ -36,7 +36,7 @@ class ChatController {
     }
 
 
-    async fetchChat(data :any ){
+    async fetchChat(data :fetchChat ){
         try {
             console.log(data, "resend otp");
             const result = await this.chatService.fetchChat(data)
@@ -49,7 +49,7 @@ class ChatController {
     }
 
 
-    async storeFile(data :any ){
+    async storeFile(data :StoreFile ){
         try {
             console.log(data, "storefile -------------");
             const result = await this.chatService.storeFile(data)
@@ -62,7 +62,7 @@ class ChatController {
     }
     
 
-    async fetchLastMessage(data :any ){
+    async fetchLastMessage(data :Course[] ){
         try {
             console.log(data, "storefile -------------");
             const result = await this.chatService.fetchLastMessage(data)
@@ -75,7 +75,7 @@ class ChatController {
     }
 
 
-    async updateReadMessage(data :any ){
+    async updateReadMessage(data :updateRead ){
         try {
             console.log(data, "update read -------------");
             const result = await this.chatService.updateReadMessage(data)
@@ -87,18 +87,6 @@ class ChatController {
         }
     }
 
-
-    async updateReadStatus(data :any ){
-        try {
-            console.log(data, "storefile -------------");
-            const result = await this.chatService.updateReadStatus(data)
-
-            console.log(result, "of the resendOtp")
-            return result
-        } catch (error) {
-            console.log("error in resend otp in usercontroller", error);
-        }
-    }
 
 
     async updateReadUsers(data :findRoom ){
@@ -119,6 +107,19 @@ class ChatController {
         try {
             console.log(data, "lalalallalalalallalalal -------------");
             const result = await this.chatService.fetchGroupMembers(data)
+
+            console.log(result, "of the resendOtp")
+            return result
+        } catch (error) {
+            console.log("error in resend otp in usercontroller", error);
+        }
+    }
+
+
+    async fetchStreamUsers(data : streamFetch ){
+        try {
+            console.log(data, "lalalallalalalallalalal -------------");
+            const result = await this.chatService.fetchStreamUsers(data)
 
             console.log(result, "of the resendOtp")
             return result

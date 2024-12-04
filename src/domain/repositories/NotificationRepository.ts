@@ -1,12 +1,12 @@
 
 import { Notification } from "../../model/notification"; // Your Mongoose model
-import { INotification, INotificationDocument,IRoomIdsArray,IStoreNotificationData} from "../entities/INotification";
+import { INotification, INotificationDocument,IRoomIdsArray,IStoreNotificationData,IMessage} from "../entities/INotification";
 
 export class NotificationRepository {
   
     async storeNotification(data: IStoreNotificationData): Promise<INotification | null> {
         try {
-            const { roomId, content } = data.message;
+            const { roomId, content,senderId} = data.message as IMessage;
             const username = data.username;
 
             const coursename = data.coursename
@@ -18,6 +18,7 @@ export class NotificationRepository {
             const newNotification: Partial<INotification> = {
                 roomId,
                 coursename,
+                userId:senderId,
                 thumbnail,
                 username,
                 message: content,
@@ -43,7 +44,8 @@ export class NotificationRepository {
       console.log(data, "data in fetchNotification");
   
 
-      const roomIds = data.map(item => item.roomId);
+      const roomIds = (data as IRoomIdsArray).map((item) => item.roomId);
+
   
       const notifications = await Notification.aggregate([
         { $match: { roomId: { $in: roomIds } } },
