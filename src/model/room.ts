@@ -20,7 +20,7 @@ const roomSchema = new Schema<IRoomDocument>({
   },
   view: [{
     userId: {
-      type: String,
+      type: String,   
       required: true
     },
     isRead: {
